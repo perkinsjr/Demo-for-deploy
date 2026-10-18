@@ -24,6 +24,27 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
+  /whoami:
+    get:
+      summary: Return the caller principal from X-Unkey-Principal
+      operationId: whoami
+      parameters:
+        - in: header
+          name: X-Unkey-Principal
+          required: false
+          schema:
+            type: string
+          description: JSON principal when valid JSON; otherwise treated as a string.
+      responses:
+        '200':
+          description: The principal, or null when the header is missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  principal: {}
+                required: [principal]
   /items:
     get:
       summary: List items

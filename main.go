@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -38,6 +39,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", healthHandler)
+	r.GET("/whoami", whoamiHandler)
 	r.GET("/items", getItemsHandler)
 	r.GET("/items/:id", getItemByIDHandler)
 	r.POST("/items", createItemHandler)
@@ -50,6 +52,22 @@ func healthHandler(c *gin.Context) {
 		"status":    "healthy",
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
+}
+
+func whoamiHandler(c *gin.Context) {
+	raw := c.GetHeader("X-Unkey-Principal")
+	if raw == "" {
+		c.JSON(http.StatusOK, gin.H{"principal": nil})
+		return
+	}
+
+	var parsed json.RawMessage
+	if err := json.Unmarshal([]byte(raw), &parsed); err == nil {
+		c.JSON(http.StatusOK, gin.H{"principal": parsed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"principal": raw})
 }
 
 func getItemsHandler(c *gin.Context) {
