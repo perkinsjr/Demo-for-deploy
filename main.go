@@ -38,6 +38,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", healthHandler)
+	r.GET("/whoami", whoamiHandler)
 	r.GET("/items", getItemsHandler)
 	r.GET("/items/:id", getItemByIDHandler)
 	r.POST("/items", createItemHandler)
@@ -49,6 +50,17 @@ func healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "healthy",
 		"timestamp": time.Now().Format(time.RFC3339),
+	})
+}
+
+func whoamiHandler(c *gin.Context) {
+	var principal *string
+	if value := c.GetHeader("X-Unkey-Principal"); value != "" {
+		principal = &value
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"principal": principal,
 	})
 }
 
