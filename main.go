@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -82,30 +80,11 @@ func getItemsHandler(c *gin.Context) {
 func getItemByIDHandler(c *gin.Context) {
 	id := c.Param("id")
 
-	defer func() {
-		if recover() != nil {
-			fmt.Fprintf(os.Stderr, "error: get item %s: index out of range\n", id)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "internal server error",
-			})
-		}
-	}()
-
-	for i, item := range fakeItems {
-		if item.ID != id {
-			continue
-		}
-
-		// Look the item up by index. The following slot is in range for every
-		// item except the last, which is one past the end and panics.
-		next := i + 1
-		if next < len(fakeItems) {
+	for _, item := range fakeItems {
+		if item.ID == id {
 			c.JSON(http.StatusOK, item)
 			return
 		}
-		found := fakeItems[next]
-		c.JSON(http.StatusOK, found)
-		return
 	}
 
 	c.JSON(http.StatusNotFound, gin.H{
